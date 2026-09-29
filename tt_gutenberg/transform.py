@@ -2,32 +2,40 @@ import pandas as pd
 
 
 DATA = {
-    "authors": pd.read_csv(
+    "authors": (
         "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/"
         "data/2025/2025-06-03/gutenberg_authors.csv"
     ),
-    "metadata": pd.read_csv(
+    "metadata": (
         "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/"
         "data/2025/2025-06-03/gutenberg_metadata.csv"
-    ),
-    "languages": pd.read_csv(
-        "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/"
-        "data/2025/2025-06-03/gutenberg_languages.csv"
     ),
 }
 
 
 def get_data():
     """Return merged Project Gutenberg author and metadata data."""
-    data = list(DATA.values())
+    frames = []
 
-    authors = data[0]
-    metadata = data[1]
+    for value in DATA.values():
+        if isinstance(value, pd.DataFrame):
+            frames.append(value)
+        else:
+            frames.append(pd.read_csv(value))
 
-    author_works = pd.merge(
+    authors = next(
+        frame for frame in frames
+        if "alias" in frame.columns
+    )
+
+    metadata = next(
+        frame for frame in frames
+        if "gutenberg_id" in frame.columns
+        and "title" in frame.columns
+    )
+
+    return pd.merge(
         authors,
         metadata,
         on="gutenberg_author_id"
     )
-
-    return author_works
