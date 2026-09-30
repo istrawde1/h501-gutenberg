@@ -15,27 +15,15 @@ DATA = {
 
 def get_data():
     """Return merged Project Gutenberg author and metadata data."""
-    frames = []
+    authors = pd.read_csv(DATA["authors"])
+    metadata = pd.read_csv(DATA["metadata"])
 
-    for value in DATA.values():
-        if isinstance(value, pd.DataFrame):
-            frames.append(value)
-        else:
-            frames.append(pd.read_csv(value))
+    metadata = metadata.drop(columns="author")
 
-    authors = next(
-        frame for frame in frames
-        if "alias" in frame.columns
-    )
-
-    metadata = next(
-        frame for frame in frames
-        if "gutenberg_id" in frame.columns
-        and "title" in frame.columns
-    )
-
-    return pd.merge(
+    author_works = pd.merge(
         authors,
         metadata,
         on="gutenberg_author_id"
     )
+
+    return author_works
