@@ -15,8 +15,10 @@ DATA = {
 
 def get_data():
     """Return merged Project Gutenberg author and metadata data."""
-    authors = pd.read_csv(DATA["authors"])
-    metadata = pd.read_csv(DATA["metadata"])
+    authors_source, metadata_source = DATA.values()
+
+    authors = pd.read_csv(authors_source)
+    metadata = pd.read_csv(metadata_source)
 
     metadata = metadata.drop(columns="author")
 
